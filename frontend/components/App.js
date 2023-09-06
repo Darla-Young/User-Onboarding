@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import * as Yup from 'yup'
 
 const e = {
@@ -40,10 +40,21 @@ const schema = Yup.object().shape({
 
 export default function App() {
   // ✨ TASK: BUILD YOUR STATES HERE
-  
-  // You will need states to track (1) the form, (2) the validation errors,
-  // (3) whether submit is disabled, (4) the success message from the server,
-  // and (5) the failure message from the server.
+  const [ form, setForm ] = useState({
+    username: '',
+    favLanguage: '',
+    favFood: '',
+    agreement: false
+  })
+  const [ errors, setErrors ] = useState({
+    username: '',
+    favLanguage: '',
+    favFood: '',
+    agreement: ''
+  })
+  const [ disabled, setDisabled ] = useState(true)
+  const [ successful, setSuccessful ] = useState('')
+  const [ failure, setFailure ] = useState('')
 
   // ✨ TASK: BUILD YOUR EFFECT HERE
   // Whenever the state of the form changes, validate it against the schema
