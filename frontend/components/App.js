@@ -57,8 +57,10 @@ export default function App() {
   const [ failure, setFailure ] = useState('')
 
   // ✨ TASK: BUILD YOUR EFFECT HERE
-  // Whenever the state of the form changes, validate it against the schema
-  // and update the state that tracks whether the form is submittable.
+  useEffect(() => {
+    schema.isValid(form)
+      .then(valid => setDisabled(!valid))
+  }, [form])
 
   const onChange = evt => {
     // ✨ TASK: IMPLEMENT YOUR INPUT CHANGE HANDLER
