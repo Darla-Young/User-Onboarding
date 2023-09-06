@@ -1,8 +1,7 @@
-// ❗ The ✨ TASKS inside this component are NOT IN ORDER.
-// ❗ Check the README for the appropriate sequence to follow.
 import React from 'react'
+import * as Yup from 'yup'
 
-const e = { // This is a dictionary of validation error messages.
+const e = {
   // username
   usernameRequired: 'username is required',
   usernameMin: 'username must be at least 3 characters',
@@ -19,10 +18,29 @@ const e = { // This is a dictionary of validation error messages.
 }
 
 // ✨ TASK: BUILD YOUR FORM SCHEMA HERE
-// The schema should use the error messages contained in the object above.
+const schema = Yup.object().shape({
+  username: Yup
+    .string()
+    .required(e.usernameRequired)
+    .min(3, e.usernameMin)
+    .max(20, e.usernameMax),
+  favLanguage: Yup
+    .string()
+    .required(e.favLanguageRequired)
+    .oneOf(['javascript', 'rust'], e.favLanguageOptions),
+  favFood: Yup
+    .string()
+    .required(e.favFoodRequired)
+    .oneOf(['broccoli', 'spaghetti', 'pizza'], e.favFoodOptions),
+  agreement: Yup
+    .boolean()
+    .required(e.agreementRequired)
+    .oneOf([true], e.agreementOptions)
+})
 
 export default function App() {
   // ✨ TASK: BUILD YOUR STATES HERE
+  
   // You will need states to track (1) the form, (2) the validation errors,
   // (3) whether submit is disabled, (4) the success message from the server,
   // and (5) the failure message from the server.
