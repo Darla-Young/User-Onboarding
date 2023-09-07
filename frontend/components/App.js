@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from 'react'
 import * as Yup from 'yup'
+import axios from 'axios'
 
 const e = {
   // username
@@ -40,21 +41,16 @@ const schema = Yup.object().shape({
 
 export default function App() {
   // ✨ TASK: BUILD YOUR STATES HERE
-  const [form, setForm] = useState({
+  const initialState = {
     username: '',
     favLanguage: '',
     favFood: '',
     agreement: false
-  })
-  const [errors, setErrors] = useState({
-    username: '',
-    favLanguage: '',
-    favFood: '',
-    agreement: ''
-  })
+  }
+  const [form, setForm] = useState(initialState)
+  const [errors, setErrors] = useState({...initialState, agreement: ''})
   const [disabled, setDisabled] = useState(true)
-  const [successful, setSuccessful] = useState('')
-  const [failure, setFailure] = useState('')
+  const [response, setResponse] = useState('')
 
   // ✨ TASK: BUILD YOUR EFFECT HERE
   useEffect(() => {
@@ -69,7 +65,7 @@ export default function App() {
     setForm({...form, [name]: useThis})
     Yup
       .reach(schema, name)
-      .validate(value)
+      .validate(useThis)
       .then(() => {
         setErrors({...errors, [name]: ''})
       })
@@ -80,62 +76,89 @@ export default function App() {
 
   const onSubmit = evt => {
     // ✨ TASK: IMPLEMENT YOUR SUBMIT HANDLER
-    // Lots to do here! Prevent default behavior, disable the form to avoid
-    // double submits, and POST the form data to the endpoint. On success, reset
-    // the form. You must put the success and failure messages from the server
-    // in the states you have reserved for them, and the form
-    // should be re-enabled.
+    evt.preventDefault()
+    setDisabled(true)
+    const newUser = {...form, username: form.username.trim()}
+    axios
+      .post('https://webapis.bloomtechdev.com/registration', newUser)
+      .then(() => {
+        setForm(initialState)
+        setResponse({
+          type: 'success',
+          message: `Success! Welcome, ${newUser.username}!`
+        })
+      })
+      .catch(err => {
+        setResponse({
+          type: 'error',
+          message: err.message
+        })
+      })
+  }
+
+  const responseDisplay = () => {
+    if(response != '') {
+      return (
+        <h4 className={response.type}>{response.message}</h4>
+      )
+    }
+  }
+
+  const errorDisplay = input => {
+    if(errors[input] != '') {
+      return (
+        <div className='validation'>{errors[input]}</div>
+      )
+    }
   }
 
   return (
     <div> {/* TASK: COMPLETE THE JSX */}
+      {responseDisplay()}
       <h2>Create an Account</h2>
-      <form>
-        <h4 className="success">Success! Welcome, new user!</h4>
-        <h4 className="error">Sorry! Username is taken</h4>
-
+      <form onSubmit={onSubmit}>
         <div className="inputGroup">
           <label htmlFor="username">Username:</label>
-          <input id="username" name="username" type="text" placeholder="Type Username" />
-          <div className="validation">username is required</div>
+          <input onChange={onChange} id="username" name="username" type="text" value={form.username} placeholder="Type Username" />
+          {errorDisplay('username')}
         </div>
 
         <div className="inputGroup">
           <fieldset>
             <legend>Favorite Language:</legend>
             <label>
-              <input type="radio" name="favLanguage" value="javascript" />
+              <input onChange={onChange} type="radio" checked={form.favLanguage === 'javascript'} name="favLanguage" value="javascript" />
               JavaScript
             </label>
             <label>
-              <input type="radio" name="favLanguage" value="rust" />
+              <input onChange={onChange} type="radio" checked={form.favLanguage === 'rust'} name="favLanguage" value="rust" />
               Rust
             </label>
           </fieldset>
-          <div className="validation">favLanguage is required</div>
+          {errorDisplay('favLanguage')}
         </div>
 
         <div className="inputGroup">
           <label htmlFor="favFood">Favorite Food:</label>
-          <select id="favFood" name="favFood">
+          <select onChange={onChange} id="favFood" value={form.favFood} name="favFood">
             <option value="">-- Select Favorite Food --</option>
             <option value="pizza">Pizza</option>
             <option value="spaghetti">Spaghetti</option>
             <option value="broccoli">Broccoli</option>
           </select>
-          <div className="validation">favFood is required</div>
+          {errorDisplay('favFood')}
         </div>
 
         <div className="inputGroup">
           <label>
-            <input id="agreement" type="checkbox" name="agreement" />
+            <input onChange={onChange} id="agreement" checked={form.agreement} type="checkbox" name="agreement" />
             Agree to our terms
           </label>
-          <div className="validation">agreement is required</div>
+          {errorDisplay('agreement')}
         </div>
 
         <div>
-          <input type="submit" disabled={false} />
+          <input onChange={onChange} type="submit" disabled={disabled} />
         </div>
       </form>
     </div>
