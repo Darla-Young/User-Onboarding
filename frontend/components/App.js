@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, {useState, useEffect} from 'react'
 import * as Yup from 'yup'
 
 const e = {
@@ -40,21 +40,21 @@ const schema = Yup.object().shape({
 
 export default function App() {
   // ✨ TASK: BUILD YOUR STATES HERE
-  const [ form, setForm ] = useState({
+  const [form, setForm] = useState({
     username: '',
     favLanguage: '',
     favFood: '',
     agreement: false
   })
-  const [ errors, setErrors ] = useState({
+  const [errors, setErrors] = useState({
     username: '',
     favLanguage: '',
     favFood: '',
     agreement: ''
   })
-  const [ disabled, setDisabled ] = useState(true)
-  const [ successful, setSuccessful ] = useState('')
-  const [ failure, setFailure ] = useState('')
+  const [disabled, setDisabled] = useState(true)
+  const [successful, setSuccessful] = useState('')
+  const [failure, setFailure] = useState('')
 
   // ✨ TASK: BUILD YOUR EFFECT HERE
   useEffect(() => {
@@ -64,10 +64,18 @@ export default function App() {
 
   const onChange = evt => {
     // ✨ TASK: IMPLEMENT YOUR INPUT CHANGE HANDLER
-    // The logic is a bit different for the checkbox, but you can check
-    // whether the type of event target is "checkbox" and act accordingly.
-    // At every change, you should validate the updated value and send the validation
-    // error to the state where we track frontend validation errors.
+    const {checked, type, name, value} = evt.target
+    const useThis = type === 'checkbox' ? checked : value
+    setForm({...form, [name]: useThis})
+    Yup
+      .reach(schema, name)
+      .validate(value)
+      .then(() => {
+        setErrors({...errors, [name]: ''})
+      })
+      .catch(err => {
+        setErrors({...errors, [name]: err.errors[0]})
+      })
   }
 
   const onSubmit = evt => {
