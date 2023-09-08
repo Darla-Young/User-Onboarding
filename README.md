@@ -1,4 +1,5 @@
 # Sprint 7 Module 3 Project
+[link](frontend\components\UserRegistration.png)
 
 ## Introduction
 
